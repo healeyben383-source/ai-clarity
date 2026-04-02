@@ -46,6 +46,8 @@ RECOMMENDATIONS MUST BE CONCRETE AND IMPLEMENTATION-READY:
 - Avoid generic phrases like "implement a system" or "leverage AI".
 - Instead describe: what is created, where it lives, how it runs, and what triggers it.
 - Every recommendation should feel like it could be executed tomorrow by the business owner.
+- Do not repeat the same tool or concept more than once within a section — if it's already established, move on.
+- Prefer tight, natural phrasing a human consultant would use. Cut filler.
 
 Keep the entire response under 300–400 words.
 
