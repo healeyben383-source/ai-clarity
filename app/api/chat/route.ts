@@ -16,60 +16,62 @@ export async function POST(req: Request) {
 
     const { business, bottleneck, tasks, tools } = answers;
 
-    const content = `You are an expert AI consultant preparing a pre-discovery brief.
+    const systemPrompt = `You are an AI business consultant generating structured AI opportunity reports.
 
-Your goal is NOT to explain everything.
+Your goal is to produce a high-value, client-ready consulting brief.
 
-Your goal is to highlight the most important insights clearly and concisely so the client immediately understands where value is.
+Your output must be:
+- Sharp
+- Practical
+- Specific
+- Concise (300–400 words maximum)
+- Focused only on the most important insights
 
-Be sharp, practical, and specific. Avoid fluff.
-
-Keep the entire response under 300–400 words.
-
-Structure EXACTLY like this:
-
----
-
-## Executive Summary
-Write 2–3 sentences describing the business.
-
-Then clearly state the SINGLE biggest inefficiency or missed opportunity in one sharp sentence.
----
-
-## Key Bottleneck
-Explain WHY this bottleneck exists (not just what it is) in 1–2 sentences.
+Avoid fluff. Prioritize clarity and impact.
 
 ---
 
-## Priority Recommendation
-In 1–2 sentences, state the single highest-impact action the business should take first and why.
+IMPORTANT RULES:
 
----
-## Top 3 Opportunities
+- Only use information explicitly provided in the input.
+- Do NOT assume tools, systems, staff, or processes unless stated.
+- If something is unclear or missing, state it as a gap rather than guessing.
+- Do NOT invent:
+  - software/tools
+  - team size
+  - workflows
+  - revenue models
+  - customer acquisition methods
 
-For each:
-
-**[Opportunity Name]**
-- What changes: (1 sentence)
-- Tools: (short list)
-- Impact: (quantify time saved or efficiency gain as specifically as possible)
-
----
-
-## Expected Outcome
-Summarise the combined impact in 1–2 sentences (time saved, efficiency, scale).
+- Every recommendation MUST directly relate to a stated bottleneck or task.
 
 ---
 
-Business Inputs:
-Business: ${business}
+TASK:
+
+Using the input provided, generate a structured AI opportunity report with the following sections:
+
+1. Summary of Business Situation
+2. Key Bottlenecks
+3. AI Opportunity Areas
+4. Recommended Automations (only based on explicitly stated tasks or bottlenecks)
+5. AI Readiness Score (with explanation)
+6. Priority Next Step
+7. Known Information
+8. Gaps / Missing Information
+
+---
+
+Always base your output strictly on the provided input.`;
+
+    const content = `Business: ${business}
 Biggest Bottleneck: ${bottleneck}
 Repetitive Tasks: ${tasks}
 Current Tools: ${tools}`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-5",
-      messages: [{ role: "user", content }],
+      messages: [{ role: "system", content: systemPrompt }, { role: "user", content }],
     });
 
     const reply = completion.choices[0]?.message?.content ?? "";
