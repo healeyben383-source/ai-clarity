@@ -16,23 +16,25 @@ type Report = {
 
 function calcReadinessScore(r: Pick<Report, "business" | "bottleneck" | "tasks" | "tools">) {
   const text = [r.business, r.bottleneck, r.tasks, r.tools].join(" ").toLowerCase();
-  let score = 30;
+  let score = 20;
   const signals = [
     "manual","email","follow-up","follow up","document","reminder",
     "spreadsheet","copy","paste","data entry","invoice","report",
     "chase","chasing","pdf","form","upload","download",
   ];
   let signalHits = 0;
-  for (const word of signals) if (text.includes(word)) { score += 8; signalHits++; }
+  for (const word of signals) if (text.includes(word)) { score += 5; signalHits++; }
   const toolCount = r.tools.split(/[,/&+]/).filter((t) => t.trim()).length;
-  score += Math.min(toolCount * 5, 20);
-  if (r.tasks.split(" ").length > 10) score += 10;
-  score = Math.min(score, 100);
+  score += Math.min(toolCount * 3, 12);
+  if (r.tasks.split(" ").length > 10) score += 6;
+  // Soft cap: only exceed 88 if signals and tools are both high
+  const hardCap = signalHits >= 6 && toolCount >= 4 ? 95 : 88;
+  score = Math.min(score, hardCap);
 
   const label =
-    score >= 90 ? "Transformational Opportunity" :
-    score >= 70 ? "Strong Opportunity" :
-    score >= 40 ? "Moderate Opportunity" : "Low Leverage";
+    score >= 85 ? "Transformational Opportunity" :
+    score >= 65 ? "Strong Opportunity" :
+    score >= 45 ? "Moderate Opportunity" : "Low Leverage";
 
   const reason =
     signalHits >= 4 && toolCount >= 3
