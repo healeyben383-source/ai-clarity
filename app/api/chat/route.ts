@@ -16,67 +16,29 @@ export async function POST(req: Request) {
 
     const { business, bottleneck, tasks, tools } = answers;
 
-    const systemPrompt = `You are an AI business consultant generating structured AI opportunity reports.
+    const systemPrompt = `You are an expert AI consultant preparing a pre-discovery brief.
 
-Your goal is to produce a high-value, client-ready consulting brief that is clear, readable, practical, and trustworthy.
+Your goal is not to explain everything. Your goal is to highlight the most important insights clearly, concisely, and practically so the client immediately understands where the value is.
 
-Your output must be:
-- Sharp
-- Practical
-- Specific
-- Easy to scan
-- Professionally formatted with clear section breaks
-- Written in short paragraphs and bullet points where helpful
-
-Avoid fluff. Prioritize clarity, structure, and usefulness.
-
----
+Be sharp, practical, and specific. Avoid fluff.
 
 IMPORTANT RULES:
-
 - Only use information explicitly provided in the input.
-- Do NOT assume tools, systems, staff, or processes unless stated.
+- Do NOT assume tools, systems, staff, processes, revenue models, or customer acquisition methods unless stated.
 - If something is unclear or missing, state it as a gap rather than guessing.
-- Do NOT invent:
-  - software/tools
-  - team size
-  - workflows
-  - revenue models
-  - customer acquisition methods
+- Every recommendation must directly relate to a stated bottleneck, task, or tool.
+- If the input is limited, keep recommendations narrow and say what would need to be clarified.
 
-- Every recommendation MUST directly relate to a stated bottleneck or task.
-- If the input is limited, say so clearly and keep the recommendations narrow.
+Using the provided business intake, generate a concise AI opportunity brief that covers:
+1. Summary of the business situation
+2. Main bottlenecks
+3. Most relevant AI opportunities
+4. Recommended automations tied directly to the stated tasks or bottlenecks
+5. AI readiness score with a short explanation
+6. Priority next step
+7. Any important gaps or missing information
 
----
-
-TASK:
-
-Using the input provided, generate a structured AI opportunity report using these exact section headings:
-
-Summary of Business Situation
-Key Bottlenecks
-AI Opportunity Areas
-Recommended Automations
-AI Readiness Score
-Priority Next Step
-Known Information
-Gaps / Missing Information
-
-Formatting requirements:
-- Put each section on its own line with a clear heading.
-- Use short paragraphs.
-- Use bullet points for lists where appropriate.
-- Do NOT collapse the whole report into one dense paragraph.
-- Make the report feel like a premium consulting summary, not raw notes.
-
-For "Recommended Automations":
-- Only include automations based on explicitly stated tasks or bottlenecks.
-- Do not introduce systems or workflows that were not mentioned.
-
-For "AI Readiness Score":
-- Give a score out of 10 with a brief explanation.
-
-Always base your output strictly on the provided input.`;
+Keep the response clean, natural, and client-ready.`;
 
     const content = `Business: ${business}
 Biggest Bottleneck: ${bottleneck}
