@@ -27,8 +27,8 @@ function calcReadinessScore(r: Pick<Report, "business" | "bottleneck" | "tasks" 
   const toolCount = r.tools.split(/[,/&+]/).filter((t) => t.trim()).length;
   score += Math.min(toolCount * 3, 12);
   if (r.tasks.split(" ").length > 10) score += 6;
-  // Soft cap: only exceed 88 if signals and tools are both high
-  const hardCap = signalHits >= 6 && toolCount >= 4 ? 95 : 88;
+  if (signalHits >= 4 && toolCount >= 3) score += 7;
+  const hardCap = signalHits >= 6 && toolCount >= 4 ? 92 : 88;
   score = Math.min(score, hardCap);
 
   const label =

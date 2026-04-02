@@ -23,7 +23,8 @@ function calcReadinessScore(answers: {
   score += Math.min(toolCount * 3, 12);
   const taskWordCount = answers.tasks.split(" ").length;
   if (taskWordCount > 10) score += 6;
-  const hardCap = signalHits >= 6 && toolCount >= 4 ? 95 : 88;
+  if (signalHits >= 4 && toolCount >= 3) score += 7;
+  const hardCap = signalHits >= 6 && toolCount >= 4 ? 92 : 88;
   score = Math.min(score, hardCap);
 
   const label =
