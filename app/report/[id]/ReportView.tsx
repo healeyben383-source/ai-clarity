@@ -48,33 +48,34 @@ function calcReadinessScore(r: Pick<Report, "business" | "bottleneck" | "tasks" 
   return { score, label, reason };
 }
 
-// ── markdown cleanup ──────────────────────────────────────────────────────────
+// ── section parser ────────────────────────────────────────────────────────────
 
-function cleanMarkdown(text: string): string {
-  return text
-    .replace(/\*\*\[(.+?)\]\*\*/g, "$1")
-    .replace(/\*\*(.+?)\*\*/g, "$1")
-    .replace(/\[(.+?)\]/g, "$1")
-    .trim();
-}
+function parseSections(text: string) {
+  const sections: Record<string, string> = {};
+  const titles = [
+    "Summary of Business Situation",
+    "Key Bottlenecks",
+    "AI Opportunity Areas",
+    "Recommended Automations",
+    "AI Readiness Score",
+    "Priority Next Step",
+    "Known Information",
+    "Gaps / Missing Information",
+  ];
 
-// ── opportunity parser ────────────────────────────────────────────────────────
+  let currentTitle = "";
 
-function parseOpportunities(body: string) {
-  const lines = body.split("\n").filter((l) => l.trim());
-  const result: Array<{ title: string; bullets: string[] }> = [];
-  let current: { title: string; bullets: string[] } | null = null;
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (trimmed.startsWith("-")) {
-      current?.bullets.push(trimmed.slice(1).trim());
-    } else {
-      if (current) result.push(current);
-      current = { title: trimmed, bullets: [] };
+  for (const line of text.split("\n")) {
+    const match = titles.find((t) => line.toLowerCase().includes(t.toLowerCase()));
+    if (match) {
+      currentTitle = match;
+      sections[currentTitle] = "";
+    } else if (currentTitle) {
+      sections[currentTitle] += line + "\n";
     }
   }
-  if (current) result.push(current);
-  return result;
+
+  return sections;
 }
 
 // ── design tokens ─────────────────────────────────────────────────────────────
@@ -220,10 +221,6 @@ function Eyebrow({ children, color }: { children: React.ReactNode; color?: strin
   );
 }
 
-function Divider() {
-  return <div className="print-divider" style={{ height: 1, backgroundColor: COLOR.divider, margin: "28px 0" }} />;
-}
-
 // ── score block ───────────────────────────────────────────────────────────────
 
 function ScoreBlock({ score, label, reason }: { score: number; label: string; reason: string }) {
@@ -252,105 +249,13 @@ function ScoreBlock({ score, label, reason }: { score: number; label: string; re
   );
 }
 
-// ── opportunity list ──────────────────────────────────────────────────────────
-
-const BULLET_LABEL_COLOR: Record<string, string> = {
-  "what changes": "#2b6cb0",
-  "tools": "#276749",
-  "impact": "#744210",
-};
-
-function OpportunityList({ body }: { body: string }) {
-  const items = parseOpportunities(body);
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      {items.map((item, i) => (
-        <div key={i} className="report-section opp-item" style={{ padding: "18px 20px", borderRadius: 8, backgroundColor: "#fafbfc", border: `1px solid ${COLOR.border}` }}>
-          <p style={{ margin: "0 0 12px", fontSize: 14, fontWeight: 700, color: COLOR.text }}>{item.title}</p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {item.bullets.map((bullet, j) => {
-              const colonIdx = bullet.indexOf(":");
-              const hasLabel = colonIdx > 0 && colonIdx < 20;
-              const bulletLabel = hasLabel ? bullet.slice(0, colonIdx).toLowerCase() : null;
-              const bulletText = hasLabel ? bullet.slice(colonIdx + 1).trim() : bullet;
-              const labelColor = bulletLabel ? (BULLET_LABEL_COLOR[bulletLabel] ?? COLOR.textMuted) : COLOR.textMuted;
-              return (
-                <div key={j} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  {bulletLabel && (
-                    <span style={{ flexShrink: 0, minWidth: 80, fontSize: 10, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: labelColor, paddingTop: 3 }}>
-                      {bulletLabel}
-                    </span>
-                  )}
-                  <span style={{ fontSize: 14, color: COLOR.textMuted, lineHeight: 1.7 }}>{bulletText}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ── report section ────────────────────────────────────────────────────────────
-
-function ReportSection({ title, body, highlight }: { title: string; body: string; highlight?: "strong" | "soft" }) {
-  const isPriority = highlight === "strong";
-  const isNext = highlight === "soft";
-  const isOpportunities = title.toLowerCase().includes("opportunit");
-
-  if (isPriority) {
-    return (
-      <div className="report-section" style={{ padding: "24px 28px", borderRadius: 10, backgroundColor: COLOR.amberBg, border: `1px solid ${COLOR.amberBorder}`, borderLeftWidth: 4, borderLeftColor: COLOR.amberAccent }}>
-        <Eyebrow color="#b7791f">{title}</Eyebrow>
-        <p style={{ margin: 0, fontSize: 16, color: COLOR.text, lineHeight: 1.85, fontWeight: 500 }}>{body}</p>
-      </div>
-    );
-  }
-
-  if (isNext) {
-    return (
-      <div className="report-section" style={{ padding: "22px 26px", borderRadius: 10, backgroundColor: COLOR.greenBg, border: `1px solid ${COLOR.greenBorder}` }}>
-        <Eyebrow color={COLOR.green}>{title}</Eyebrow>
-        <p style={{ margin: 0, fontSize: 15, color: COLOR.text, lineHeight: 1.8 }}>{body}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="report-section">
-      <Eyebrow>{title}</Eyebrow>
-      {isOpportunities ? (
-        <OpportunityList body={body} />
-      ) : (
-        <p style={{ margin: 0, fontSize: 15, color: COLOR.textMuted, lineHeight: 1.85 }}>{body}</p>
-      )}
-    </div>
-  );
-}
 
 // ── main component ────────────────────────────────────────────────────────────
 
 export default function ReportView({ report }: { report: Report }) {
   const scoreData = calcReadinessScore(report);
 
-  const sections = report.report_output
-    .split(/\n(?=(?:##\s|\d+\.\s))/)
-    .map((s) => {
-      const [titleLine, ...rest] = s.split("\n");
-      const title = cleanMarkdown(
-        titleLine.replace(/^##\s*/, "").replace(/^\d+\.\s*/, "")
-      );
-      const body = rest
-        .filter((line) => line.trim() !== "---")
-        .map(cleanMarkdown)
-        .join("\n")
-        .trim();
-      return { title, body };
-    })
-    .filter(({ title, body }) => title && body);
-
-  const prioritySection = sections.find((s) => s.title.toLowerCase().includes("priority"));
+  const sections = parseSections(report.report_output);
 
   const businessLabel = report.business.trim().split(/\s+/).slice(0, 6).join(" ")
     + (report.business.trim().split(/\s+/).length > 6 ? "…" : "");
@@ -438,29 +343,16 @@ export default function ReportView({ report }: { report: Report }) {
 
               <ScoreBlock score={scoreData.score} label={scoreData.label} reason={scoreData.reason} />
 
-              {sections.map(({ title, body }) => {
-                const isPriority = title.toLowerCase().includes("priority");
-                return (
-                  <div key={title}>
-                    <Divider />
-                    <ReportSection title={title} body={body} highlight={isPriority ? "strong" : undefined} />
-                  </div>
-                );
-              })}
-
-              {prioritySection && (() => {
-                const firstSentence = prioritySection.body.split(/(?<=[.!?])\s+/)[0] ?? prioritySection.body;
-                return (
-                  <>
-                    <div style={{ height: 1, backgroundColor: COLOR.divider, margin: "36px 0 32px" }} />
-                    <ReportSection
-                      title="Recommended Next Step"
-                      body={`${firstSentence} Identify the right tool, assign an owner, and aim to have a working prototype or process in place within 1–2 weeks.`}
-                      highlight="soft"
-                    />
-                  </>
-                );
-              })()}
+              {Object.entries(sections).map(([title, content]) => (
+                <div key={title} className="report-section" style={{ marginTop: 28, paddingTop: 28, borderTop: `1px solid ${COLOR.divider}` }}>
+                  <p style={{ margin: "0 0 10px", fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: COLOR.textFaint }}>
+                    {title}
+                  </p>
+                  <p style={{ margin: 0, fontSize: 15, color: COLOR.textMuted, lineHeight: 1.85, whiteSpace: "pre-wrap" }}>
+                    {content.trim()}
+                  </p>
+                </div>
+              ))}
 
             </div>
           </section>
