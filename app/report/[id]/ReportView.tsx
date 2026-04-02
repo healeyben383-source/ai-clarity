@@ -1,7 +1,5 @@
 "use client";
 
-import ReactMarkdown from "react-markdown";
-
 // ── types ─────────────────────────────────────────────────────────────────────
 
 type Report = {
@@ -337,10 +335,12 @@ export default function ReportView({ report }: { report: Report }) {
   const scoreData = calcReadinessScore(report);
 
   const sections = report.report_output
-    .split(/\n(?=## )/)
+    .split(/\n(?=(?:##\s|\d+\.\s))/)
     .map((s) => {
       const [titleLine, ...rest] = s.split("\n");
-      const title = cleanMarkdown(titleLine.replace(/^##\s*/, ""));
+      const title = cleanMarkdown(
+        titleLine.replace(/^##\s*/, "").replace(/^\d+\.\s*/, "")
+      );
       const body = rest
         .filter((line) => line.trim() !== "---")
         .map(cleanMarkdown)
@@ -438,11 +438,29 @@ export default function ReportView({ report }: { report: Report }) {
 
               <ScoreBlock score={scoreData.score} label={scoreData.label} reason={scoreData.reason} />
 
-              <div className="prose max-w-none">
-                <ReactMarkdown>
-                  {report.report_output}
-                </ReactMarkdown>
-              </div>
+              {sections.map(({ title, body }) => {
+                const isPriority = title.toLowerCase().includes("priority");
+                return (
+                  <div key={title}>
+                    <Divider />
+                    <ReportSection title={title} body={body} highlight={isPriority ? "strong" : undefined} />
+                  </div>
+                );
+              })}
+
+              {prioritySection && (() => {
+                const firstSentence = prioritySection.body.split(/(?<=[.!?])\s+/)[0] ?? prioritySection.body;
+                return (
+                  <>
+                    <div style={{ height: 1, backgroundColor: COLOR.divider, margin: "36px 0 32px" }} />
+                    <ReportSection
+                      title="Recommended Next Step"
+                      body={`${firstSentence} Identify the right tool, assign an owner, and aim to have a working prototype or process in place within 1–2 weeks.`}
+                      highlight="soft"
+                    />
+                  </>
+                );
+              })()}
 
             </div>
           </section>
