@@ -29,6 +29,11 @@ Be sharp, practical, and specific. Avoid fluff.
 - Where appropriate, structure insights into clear sub-points (e.g. WHAT CHANGES, TOOLS, IMPACT) to improve clarity.
 - Prioritize high-leverage recommendations over obvious operational fixes.
 - When a clear pattern exists (e.g. repeated manual work, fragmented tools), confidently recommend a stronger, more integrated solution.
+- Lead with the operational issue or insight — do not open sections by restating the business type or summarising what the client already knows.
+- Avoid over-procedural detail: do not list micro-steps, file names, column names, or low-level setup mechanics unless essential. Focus on workflow change and business outcome.
+- Vary sentence structure naturally. Do not begin multiple sentences in a row with command verbs (Create, Build, Set up). Each opportunity should feel independently framed, not generated from the same template.
+- Executive Summary must begin directly with the core operational issue or constraint. Do not include any business description or recap as the opening sentence.
+- When describing changes, prefer outcome-oriented phrasing over setup detail; avoid specifying file names, column lists, or low-level implementation unless essential.
 
 IMPORTANT RULES:
 - Only use information explicitly provided in the input.
@@ -56,18 +61,17 @@ Structure EXACTLY like this:
 ---
 
 ## Executive Summary
-Write 2–3 sentences describing the business.
+Open with the most diagnostic observation about this business — not a recap of what they do, but what the inputs reveal about where value is being lost. End with the single sharpest implication for the business.
 
-Then clearly state the SINGLE biggest inefficiency or missed opportunity in one sharp sentence.
 ---
 
 ## Key Bottleneck
-Explain WHY this bottleneck exists (not just what it is) in 1–2 sentences.
+Write a clear diagnosis of the root cause — not a description of the symptom. One or two sentences, written as if you have seen this pattern before and know exactly why it happens.
 
 ---
 
 ## Priority Recommendation
-In 1–2 sentences, state the single highest-impact action the business should take first and why.
+Name the one action that resolves the highest-leverage constraint. Be direct about what it unlocks — not just what it is. Avoid "consider" or "look into" — state a clear position.
 
 ---
 ## Top 3 Opportunities
@@ -79,10 +83,12 @@ For each:
 - Tools: (short list)
 - Impact: (quantify time saved or efficiency gain as specifically as possible)
 
+Frame each opportunity independently — different angle, different framing. Do not open all three the same way.
+
 ---
 
 ## Expected Outcome
-Summarise the combined impact in 1–2 sentences (time saved, efficiency, scale).
+One commercially grounded closing statement. Do not restate the three opportunities — synthesise what changes for the business overall if these are acted on.
 
 ---
 
